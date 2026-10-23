@@ -5,7 +5,11 @@ import { useFormStatus } from "react-dom";
 
 // Peças de formulário compartilhadas entre login, cadastro e painel.
 
-export function Field({ label, ...props }: { label: string } & ComponentProps<"input">) {
+export function Field({
+  label,
+  hint,
+  ...props
+}: { label: string; hint?: string } & ComponentProps<"input">) {
   return (
     <label className="flex flex-col gap-1 text-sm">
       <span className="font-medium">{label}</span>
@@ -13,6 +17,7 @@ export function Field({ label, ...props }: { label: string } & ComponentProps<"i
         className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-base outline-none focus:border-zinc-900 dark:border-zinc-700 dark:focus:border-zinc-100"
         {...props}
       />
+      {hint && <span className="text-xs text-zinc-500">{hint}</span>}
     </label>
   );
 }

@@ -50,7 +50,7 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
     .from(units)
     .where(and(eq(units.block, block), eq(units.number, number)));
   if (!unit) {
-    return { error: "Apartamento não encontrado. Confira bloco e número.", values };
+    return { error: "Apartamento não encontrado. Use andar + final 01 a 08 (ex.: 101, 305, 1608).", values };
   }
 
   let userId: string;

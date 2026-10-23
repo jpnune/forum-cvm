@@ -12,7 +12,7 @@ export function SignupForm() {
   return (
     <form action={action} className="flex flex-col gap-4">
       <Field label="Nome" name="name" autoComplete="name" defaultValue={values.name} required />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 items-start gap-3">
         <fieldset className="flex flex-col gap-1 text-sm">
           <legend className="mb-1 font-medium">Bloco</legend>
           <div className="flex gap-2">
@@ -34,7 +34,18 @@ export function SignupForm() {
             ))}
           </div>
         </fieldset>
-        <Field label="Apartamento" name="number" inputMode="numeric" pattern="[0-9]{3,4}" placeholder="Ex.: 101" defaultValue={values.number} required />
+        {/* Andar (1–16) + final 01–08: 101–108 … 1601–1608. `title` aparece no aviso do navegador. */}
+        <Field
+          label="Apartamento"
+          name="number"
+          inputMode="numeric"
+          pattern="([1-9]|1[0-6])0[1-8]"
+          title="Andar + final 01 a 08. Ex.: 101, 305, 1608"
+          placeholder="Ex.: 305"
+          hint="Andar + final 01 a 08 (101 a 1608)"
+          defaultValue={values.number}
+          required
+        />
       </div>
       <Field label="E-mail" name="email" type="email" autoComplete="email" defaultValue={values.email} required />
       <Field label="Senha" name="password" type="password" autoComplete="new-password" minLength={8} required />
