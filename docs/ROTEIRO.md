@@ -28,7 +28,8 @@ Feito: sessão e permissões em `src/lib/session.ts` (`requireUser`/`requireAppr
 - Tela "aguardando aprovação"; painel admin para aprovar/rejeitar/bloquear
 **Pronto quando:** um usuário novo só acessa o fórum depois de aprovado.
 
-## [ ] Fase 3: Debates
+## [x] Fase 3: Debates
+Feito: leitura em `src/lib/debates.ts` (lista com abertos primeiro, detalhe, datas no horário de Brasília); actions em `src/app/debates/actions.ts`. Debate nasce sem prazo; prazo é digitado em horário de Brasília e precisa ser no futuro. Encerrar grava `closed_at` com o `now()` do banco; não há "reabrir". Testado no navegador (inclusive em 375px): criar, definir/remover prazo, encerrar, remover; morador comum não vê os controles.
 - Lista (abertos primeiro), criação, página de detalhe
 - Admin: definir/remover prazo, encerrar, remover debate
 **Pronto quando:** um morador cria debate e o admin consegue encerrá-lo.
