@@ -6,7 +6,7 @@ import { debates, profiles, units } from "@/db/schema";
 // Leitura de debates (sem votos: esses ficam em src/lib/votes.ts).
 
 // Aberto = não encerrado pelo admin e sem prazo ou antes do prazo (mesma regra de votes.ts).
-const isOpen = sql<boolean>`(${and(
+export const isOpen = sql<boolean>`(${and(
   isNull(debates.closedAt),
   or(isNull(debates.deadline), gt(debates.deadline, sql`now()`)),
 )})`;

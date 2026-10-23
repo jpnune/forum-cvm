@@ -4,6 +4,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/app/auth-actions";
+import { addComment, COMMENT_MAX, removeComment } from "@/lib/comments";
 import { db } from "@/lib/db";
 import { requireAdmin, requireApproved } from "@/lib/session";
 import { castVote, type Choice } from "@/lib/votes";
@@ -11,6 +12,7 @@ import { debates } from "@/db/schema";
 
 const TITLE_MAX = 150;
 const BODY_MAX = 10_000;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function createDebate(_prev: FormState, formData: FormData): Promise<FormState> {
   const user = await requireApproved();
@@ -92,6 +94,32 @@ export async function vote(_prev: FormState, formData: FormData): Promise<FormSt
   }
   refresh();
   return {};
+}
+
+export async function comment(_prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await requireApproved();
+  const id = debateId(formData);
+  const body = String(formData.get("body") ?? "").trim();
+
+  if (!body) return { error: "Escreva o comentário." };
+  if (body.length > COMMENT_MAX) {
+    return { error: `O comentário pode ter no máximo ${COMMENT_MAX} caracteres.`, values: { body } };
+  }
+  if (!(await addComment(user.id, id, body))) {
+    refresh();
+    return { error: "Este debate foi encerrado; não aceita mais comentários.", values: { body } };
+  }
+  refresh();
+  return {};
+}
+
+export async function deleteComment(formData: FormData) {
+  const user = await requireApproved();
+  const id = String(formData.get("commentId") ?? "");
+  if (!UUID.test(id)) throw new Error("Pedido inválido.");
+  // Sem permissão ou já removido: não faz nada; a página recarregada mostra o estado real.
+  await removeComment(id, user);
+  refresh();
 }
 
 // Votos e comentários vão junto (cascade).

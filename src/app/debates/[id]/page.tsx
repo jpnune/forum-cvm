@@ -6,11 +6,13 @@ import { DebateStatus } from "@/components/debate-status";
 import { Loading } from "@/components/loading";
 import { SiteHeader } from "@/components/site-header";
 import { CHOICES, choiceLabel } from "@/lib/choices";
+import { listComments, type Comment } from "@/lib/comments";
 import { authorLabel, countUnits, formatDateTime, getDebate } from "@/lib/debates";
-import { requireApproved } from "@/lib/session";
+import { requireApproved, type CurrentUser } from "@/lib/session";
 import { getMyUnitVote, getResults, type Choice, type Results } from "@/lib/votes";
-import { closeDebate, deleteDebate, removeDeadline } from "../actions";
+import { closeDebate, deleteComment, deleteDebate, removeDeadline } from "../actions";
 import { AutoRefresh } from "./auto-refresh";
+import { CommentForm } from "./comment-form";
 import { DeadlineForm } from "./deadline-form";
 import { VoteForm } from "./vote-form";
 
@@ -29,10 +31,11 @@ async function DebateView({ params }: { params: PageProps<"/debates/[id]">["para
   const { id } = await params;
   const debate = await getDebate(id);
   if (!debate) notFound();
-  const [results, myVote, unitCount] = await Promise.all([
+  const [results, myVote, unitCount, comments] = await Promise.all([
     getResults(debate.id),
     getMyUnitVote(user.id, debate.id),
     countUnits(),
+    listComments(debate.id),
   ]);
 
   return (
@@ -58,6 +61,7 @@ async function DebateView({ params }: { params: PageProps<"/debates/[id]">["para
           )}
         </article>
         <Voting debate={debate} results={results} myVote={myVote} unitCount={unitCount} />
+        <Comments debate={debate} comments={comments} user={user} />
         {/* Só enquanto aberto: depois de encerrado o resultado não muda mais. */}
         {debate.isOpen && <AutoRefresh />}
         {user.role === "admin" && <AdminControls debate={debate} />}
@@ -127,6 +131,44 @@ const BAR_COLORS: Record<Choice, string> = {
   against: "bg-red-600",
   abstain: "bg-zinc-400",
 };
+
+function Comments({ debate, comments, user }: { debate: Debate; comments: Comment[]; user: CurrentUser }) {
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="text-lg font-semibold">Comentários ({comments.length})</h2>
+      {comments.length === 0 && <p className="text-sm text-zinc-500">Nenhum comentário ainda.</p>}
+      <ul className="flex flex-col gap-3">
+        {comments.map((c) => {
+          // Mesma regra de removeComment: admin sempre; autor só com o debate aberto.
+          const canDelete = user.role === "admin" || (c.authorId === user.id && debate.isOpen);
+          return (
+            <li key={c.id} className="flex flex-col gap-1 rounded-xl border border-zinc-200 p-3 dark:border-zinc-800">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <p className="min-w-0 text-xs text-zinc-500">
+                  {authorLabel(c)} · {formatDateTime(c.createdAt)}
+                </p>
+                {canDelete && (
+                  <form action={deleteComment}>
+                    <input type="hidden" name="commentId" value={c.id} />
+                    <ConfirmButton confirm="Remover este comentário?" className="text-xs text-red-700 underline dark:text-red-300">
+                      Remover
+                    </ConfirmButton>
+                  </form>
+                )}
+              </div>
+              <p className="whitespace-pre-wrap break-words text-sm">{c.body}</p>
+            </li>
+          );
+        })}
+      </ul>
+      {debate.isOpen ? (
+        <CommentForm debateId={debate.id} />
+      ) : (
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">Debate encerrado: não aceita novos comentários.</p>
+      )}
+    </section>
+  );
+}
 
 function AdminControls({ debate }: { debate: Debate }) {
   return (

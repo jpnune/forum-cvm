@@ -40,7 +40,8 @@ Feito: action `vote` em `src/app/debates/actions.ts` (chama `castVote`; o aparta
 - Resultado com barras, %, e "X de 256 apartamentos votaram"; atualização imediata após votar + refresh a cada ~10s na página do debate
 **Pronto quando:** dois moradores do mesmo apartamento votam e só o último conta.
 
-## [ ] Fase 5: Comentários e moderação
+## [x] Fase 5: Comentários e moderação
+Feito: `src/lib/comments.ts` (listar, `addComment` só insere se o debate estiver aberto, na mesma consulta; `removeComment`: admin sempre, autor só com o debate aberto); actions `comment`/`deleteComment` em `src/app/debates/actions.ts`; lista e formulário na página do debate. Regras testadas com `npm run db:test-comments`. Testado no navegador (inclusive 375px) com morador e admin: morador só vê "Remover" no próprio comentário, admin remove de qualquer um, encerrado esconde o formulário.
 - Comentar, listar e remover (autor ou admin); bloqueado em debate encerrado
 **Pronto quando:** o admin remove um comentário e ele some para todos.
 
