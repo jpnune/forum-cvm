@@ -141,9 +141,8 @@ export const debates = pgTable("debates", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   body: text("body").notNull(),
-  authorId: text("author_id")
-    .notNull()
-    .references(() => user.id),
+  // null = autor excluído pelo admin; o debate continua.
+  authorId: text("author_id").references(() => user.id, { onDelete: "set null" }),
   // null = sem prazo
   deadline: timestamp("deadline", { withTimezone: true }),
   // preenchido quando o admin encerra
@@ -162,10 +161,8 @@ export const votes = pgTable(
     unitId: integer("unit_id")
       .notNull()
       .references(() => units.id),
-    // último morador do apartamento que votou
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id),
+    // último morador do apartamento que votou; null se ele foi excluído (o voto do apartamento vale)
+    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
     choice: choiceEnum("choice").notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
@@ -180,9 +177,8 @@ export const comments = pgTable(
     debateId: uuid("debate_id")
       .notNull()
       .references(() => debates.id, { onDelete: "cascade" }),
-    authorId: text("author_id")
-      .notNull()
-      .references(() => user.id),
+    // null = autor excluído pelo admin; o comentário continua.
+    authorId: text("author_id").references(() => user.id, { onDelete: "set null" }),
     body: text("body").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },

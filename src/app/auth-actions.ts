@@ -5,11 +5,12 @@ import { isAPIError } from "better-auth/api";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/session";
 import { db } from "@/lib/db";
 import { profiles, units, user } from "@/db/schema";
 
 // `values` devolve o que foi digitado (nunca a senha) para o formulário não ser apagado no erro.
-export type FormState = { error?: string; values?: Record<string, string> };
+export type FormState = { error?: string; success?: string; values?: Record<string, string> };
 
 const AUTH_ERRORS: Record<string, string> = {
   USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "Já existe uma conta com este e-mail.",
@@ -18,6 +19,7 @@ const AUTH_ERRORS: Record<string, string> = {
   INVALID_EMAIL: "E-mail inválido.",
   PASSWORD_TOO_SHORT: "A senha precisa ter pelo menos 8 caracteres.",
   PASSWORD_TOO_LONG: "Senha longa demais.",
+  INVALID_PASSWORD: "Senha atual incorreta.",
 };
 
 function authErrorMessage(error: unknown) {
@@ -96,4 +98,30 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
 export async function signOut() {
   await auth.api.signOut({ headers: await headers() });
   redirect("/login");
+}
+
+export async function changePassword(_prev: FormState, formData: FormData): Promise<FormState> {
+  await requireUser();
+  const currentPassword = String(formData.get("currentPassword") ?? "");
+  const newPassword = String(formData.get("newPassword") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+  if (!currentPassword || !newPassword) {
+    return { error: "Preencha a senha atual e a nova." };
+  }
+  if (newPassword !== confirmPassword) {
+    return { error: "A confirmação não bate com a nova senha." };
+  }
+
+  try {
+    // Desconecta os outros aparelhos; este continua logado (nextCookies grava o cookie novo).
+    await auth.api.changePassword({
+      body: { currentPassword, newPassword, revokeOtherSessions: true },
+      headers: await headers(),
+    });
+  } catch (error) {
+    return { error: authErrorMessage(error) };
+  }
+
+  return { success: "Senha alterada. Os outros aparelhos foram desconectados." };
 }

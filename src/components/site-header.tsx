@@ -15,9 +15,12 @@ export function SiteHeader({ user }: { user: CurrentUser }) {
               Painel
             </Link>
           )}
-          <span className="hidden text-zinc-600 sm:inline dark:text-zinc-400">
-            {user.name} · {user.unitLabel}
-          </span>
+          <Link href="/conta" className="underline">
+            <span className="sm:hidden">Conta</span>
+            <span className="hidden sm:inline">
+              {user.name} · {user.unitLabel}
+            </span>
+          </Link>
           <form action={signOut}>
             <button type="submit" className="rounded-lg border border-zinc-300 px-3 py-1 dark:border-zinc-700">
               Sair

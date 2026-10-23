@@ -59,6 +59,19 @@ export function SubmitButton({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Botão de envio que pede confirmação antes (ações que não dá para desfazer).
+export function ConfirmButton({ confirm, ...props }: { confirm: string } & ComponentProps<"button">) {
+  return (
+    <button
+      type="submit"
+      onClick={(e) => {
+        if (!window.confirm(confirm)) e.preventDefault();
+      }}
+      {...props}
+    />
+  );
+}
+
 export function FormError({ message }: { message?: string }) {
   if (!message) return null;
   return (

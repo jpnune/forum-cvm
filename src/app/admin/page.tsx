@@ -1,12 +1,13 @@
 import { asc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { ConfirmButton } from "@/components/form";
 import { Loading } from "@/components/loading";
 import { SiteHeader } from "@/components/site-header";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
 import { profiles, units, user } from "@/db/schema";
-import { setStatus } from "./actions";
+import { deleteMember, setStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Painel · Fórum do Condomínio" };
 
@@ -121,7 +122,7 @@ function Section({
                 <p className="truncate text-xs text-zinc-500">{m.email}</p>
               </div>
               {m.userId !== adminId && (
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {actions.map((a) => (
                     <form key={a.status} action={setStatus}>
                       <input type="hidden" name="userId" value={m.userId} />
@@ -138,6 +139,15 @@ function Section({
                       </button>
                     </form>
                   ))}
+                  <form action={deleteMember}>
+                    <input type="hidden" name="userId" value={m.userId} />
+                    <ConfirmButton
+                      confirm={`Excluir a conta de ${m.name} (Bloco ${m.block} · Apto ${m.number})? Não dá para desfazer.`}
+                      className="rounded-lg bg-red-700 px-3 py-1 text-sm text-white"
+                    >
+                      Excluir
+                    </ConfirmButton>
+                  </form>
                 </div>
               )}
             </li>

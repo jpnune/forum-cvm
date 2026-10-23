@@ -1,6 +1,6 @@
 import "server-only";
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -20,7 +20,11 @@ export type CurrentUser = {
 };
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
-  const session = await auth.api.getSession({ headers: await headers() });
+  // Cookie vindo de cookies(), não do cabeçalho original: numa Server Action que acabou de
+  // trocar a sessão (ex.: troca de senha), o re-render já enxerga o cookie novo.
+  const requestHeaders = new Headers(await headers());
+  requestHeaders.set("cookie", (await cookies()).toString());
+  const session = await auth.api.getSession({ headers: requestHeaders });
   if (!session) return null;
 
   const [profile] = await db
