@@ -22,7 +22,8 @@ Feito: 9 tabelas no Neon, 256 apartamentos (blocos A e B, 16 andares × 8: 101�
 - `db:generate` + `db:migrate`; script de seed dos 256 apartamentos (confirmar blocos/números com o usuário)
 **Pronto quando:** as tabelas existem no Neon, o seed rodou e um script de teste mostra o voto sendo sobrescrito por apartamento.
 
-## [ ] Fase 2: Cadastro, login e aprovação
+## [x] Fase 2: Cadastro, login e aprovação
+Feito: sessão e permissões em `src/lib/session.ts` (`requireUser`/`requireApproved`/`requireAdmin`, sem cache: aprovar/bloquear vale na hora); `src/proxy.ts` só checa o cookie. Primeiro admin: cadastrar pelo site e rodar `npm run db:make-admin -- email`. Testado no navegador: pendente não acessa `/` nem `/admin`, admin aprova e o morador entra.
 - Rota do Better Auth (`src/app/api/auth/[...all]/route.ts`), telas de cadastro (bloco/apto), login e logout; `proxy` protegendo as páginas
 - Tela "aguardando aprovação"; painel admin para aprovar/rejeitar/bloquear
 **Pronto quando:** um usuário novo só acessa o fórum depois de aprovado.

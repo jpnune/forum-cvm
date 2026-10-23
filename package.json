@@ -11,7 +11,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx --conditions=react-server --env-file=.env.local scripts/seed-units.mts",
-    "db:test-votes": "tsx --conditions=react-server --env-file=.env.local scripts/test-votes.mts"
+    "db:test-votes": "tsx --conditions=react-server --env-file=.env.local scripts/test-votes.mts",
+    "db:make-admin": "tsx --conditions=react-server --env-file=.env.local scripts/make-admin.mts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

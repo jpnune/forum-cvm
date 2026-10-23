@@ -1,11 +1,25 @@
+import { Suspense } from "react";
+import { Loading } from "@/components/loading";
+import { SiteHeader } from "@/components/site-header";
+import { requireApproved } from "@/lib/session";
+
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-      <h1 className="text-3xl font-semibold">Fórum do Condomínio</h1>
-      <p className="max-w-md text-zinc-600 dark:text-zinc-400">
-        Abra debates, vote e acompanhe as decisões do condomínio.
-      </p>
-      <p className="text-sm text-zinc-500">Em construção.</p>
-    </main>
+    <Suspense fallback={<Loading />}>
+      <Forum />
+    </Suspense>
+  );
+}
+
+async function Forum() {
+  const user = await requireApproved();
+  return (
+    <>
+      <SiteHeader user={user} />
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 p-4">
+        <h1 className="text-2xl font-semibold">Debates</h1>
+        <p className="text-zinc-600 dark:text-zinc-400">Nenhum debate ainda.</p>
+      </main>
+    </>
   );
 }
