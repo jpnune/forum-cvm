@@ -34,7 +34,8 @@ Feito: leitura em `src/lib/debates.ts` (lista com abertos primeiro, detalhe, dat
 - Admin: definir/remover prazo, encerrar, remover debate
 **Pronto quando:** um morador cria debate e o admin consegue encerrá-lo.
 
-## [ ] Fase 4: Votação
+## [x] Fase 4: Votação
+Feito: action `vote` em `src/app/debates/actions.ts` (chama `castVote`; o apartamento vem do perfil). Botões em `vote-form.tsx` com destaque otimista; resultado (barras, %, "X de N apartamentos votaram", N contado da tabela `units`) renderizado no servidor; `auto-refresh.tsx` faz `router.refresh()` a cada 10s só com o debate aberto e a aba visível. Encerrado: mostra "Resultado final" e o voto do apartamento, sem botões. Testado no navegador (inclusive 375px) com dois moradores do B-168: só o último voto contou; voto após encerrar foi recusado.
 - Botões A favor / Contra / Abstenção, voto atual do apartamento destacado, troca de voto
 - Resultado com barras, %, e "X de 256 apartamentos votaram"; atualização imediata após votar + refresh a cada ~10s na página do debate
 **Pronto quando:** dois moradores do mesmo apartamento votam e só o último conta.

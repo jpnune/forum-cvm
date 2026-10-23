@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import type { FormState } from "@/app/auth-actions";
 import { db } from "@/lib/db";
 import { requireAdmin, requireApproved } from "@/lib/session";
+import { castVote, type Choice } from "@/lib/votes";
 import { debates } from "@/db/schema";
 
 const TITLE_MAX = 150;
@@ -76,6 +77,21 @@ export async function closeDebate(formData: FormData) {
     .set({ closedAt: sql`now()` })
     .where(and(eq(debates.id, debateId(formData)), isNull(debates.closedAt)));
   refresh();
+}
+
+// O apartamento vem do perfil (dentro de castVote); o formulário só manda debate e escolha.
+export async function vote(_prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await requireApproved();
+  const id = debateId(formData);
+  try {
+    await castVote(user.id, id, String(formData.get("choice") ?? "") as Choice);
+  } catch (error) {
+    // Debate encerrado no meio do caminho: mostra o motivo e a página já volta encerrada.
+    refresh();
+    return { error: error instanceof Error ? error.message : "Não foi possível votar." };
+  }
+  refresh();
+  return {};
 }
 
 // Votos e comentários vão junto (cascade).

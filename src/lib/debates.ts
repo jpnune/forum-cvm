@@ -64,3 +64,9 @@ const dateTimeFormat = new Intl.DateTimeFormat("pt-BR", {
 export function formatDateTime(date: Date) {
   return dateTimeFormat.format(date);
 }
+
+// Total de apartamentos cadastrados (256), base do "X de N apartamentos votaram".
+export async function countUnits() {
+  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(units);
+  return row.count;
+}
