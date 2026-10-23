@@ -13,6 +13,7 @@
     "db:seed": "tsx --conditions=react-server --env-file=.env.local scripts/seed-units.mts",
     "db:test-votes": "tsx --conditions=react-server --env-file=.env.local scripts/test-votes.mts",
     "db:test-comments": "tsx --conditions=react-server --env-file=.env.local scripts/test-comments.mts",
+    "db:test-filters": "tsx --conditions=react-server --env-file=.env.local scripts/test-filters.mts",
     "db:make-admin": "tsx --conditions=react-server --env-file=.env.local scripts/make-admin.mts"
   },
   "dependencies": {

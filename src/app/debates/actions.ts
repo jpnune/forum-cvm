@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import type { FormState } from "@/app/auth-actions";
 import { addComment, COMMENT_MAX, removeComment } from "@/lib/comments";
 import { db } from "@/lib/db";
+import { markAllRead, markRead } from "@/lib/debates";
 import { requireAdmin, requireApproved } from "@/lib/session";
 import { castVote, type Choice } from "@/lib/votes";
 import { debates } from "@/db/schema";
@@ -119,6 +120,19 @@ export async function deleteComment(formData: FormData) {
   if (!UUID.test(id)) throw new Error("Pedido inválido.");
   // Sem permissão ou já removido: não faz nada; a página recarregada mostra o estado real.
   await removeComment(id, user);
+  refresh();
+}
+
+// Chamada pela página do debate ao abrir e quando chegam comentários novos.
+export async function markDebateRead(id: string) {
+  const user = await requireApproved();
+  if (!UUID.test(id)) return;
+  await markRead(user.id, id);
+}
+
+export async function markAllDebatesRead() {
+  const user = await requireApproved();
+  await markAllRead(user.id);
   refresh();
 }
 

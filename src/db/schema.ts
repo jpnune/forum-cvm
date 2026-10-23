@@ -5,6 +5,7 @@ import {
   integer,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -183,4 +184,19 @@ export const comments = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [index("comments_debateId_idx").on(table.debateId)],
+);
+
+// Até quando cada usuário leu cada debate (base do "não lidos").
+export const debateReads = pgTable(
+  "debate_reads",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    debateId: uuid("debate_id")
+      .notNull()
+      .references(() => debates.id, { onDelete: "cascade" }),
+    readAt: timestamp("read_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.debateId] })],
 );

@@ -70,3 +70,12 @@ export async function getMyUnitVote(userId: string, debateId: string): Promise<C
     .where(and(eq(profiles.userId, userId), eq(votes.debateId, debateId)));
   return row?.choice ?? null;
 }
+
+// Quantos apartamentos votaram em cada debate (só o total, para ordenar a lista).
+export async function getVoteTotals(): Promise<Map<string, number>> {
+  const rows = await db
+    .select({ debateId: votes.debateId, count: sql<number>`count(*)::int` })
+    .from(votes)
+    .groupBy(votes.debateId);
+  return new Map(rows.map((row) => [row.debateId, row.count]));
+}

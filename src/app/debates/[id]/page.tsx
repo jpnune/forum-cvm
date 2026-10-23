@@ -14,6 +14,7 @@ import { closeDebate, deleteComment, deleteDebate, removeDeadline } from "../act
 import { AutoRefresh } from "./auto-refresh";
 import { CommentForm } from "./comment-form";
 import { DeadlineForm } from "./deadline-form";
+import { MarkRead } from "./mark-read";
 import { VoteForm } from "./vote-form";
 
 type Debate = NonNullable<Awaited<ReturnType<typeof getDebate>>>;
@@ -64,6 +65,7 @@ async function DebateView({ params }: { params: PageProps<"/debates/[id]">["para
         <Comments debate={debate} comments={comments} user={user} />
         {/* Só enquanto aberto: depois de encerrado o resultado não muda mais. */}
         {debate.isOpen && <AutoRefresh />}
+        <MarkRead debateId={debate.id} commentCount={comments.length} />
         {user.role === "admin" && <AdminControls debate={debate} />}
       </main>
     </>
