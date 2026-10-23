@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { signUp } from "@/app/auth-actions";
-import { Field, FormError, SubmitButton } from "@/components/form";
+import { Field, FormError, PasswordField, SubmitButton } from "@/components/form";
 
 const BLOCKS = ["A", "B"];
 
@@ -48,7 +48,7 @@ export function SignupForm() {
         />
       </div>
       <Field label="E-mail" name="email" type="email" autoComplete="email" defaultValue={values.email} required />
-      <Field label="Senha" name="password" type="password" autoComplete="new-password" minLength={8} required />
+      <PasswordField label="Senha" name="password" autoComplete="new-password" minLength={8} required />
       <FormError message={state.error} />
       <SubmitButton>Criar conta</SubmitButton>
     </form>

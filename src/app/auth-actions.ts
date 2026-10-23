@@ -25,7 +25,8 @@ function authErrorMessage(error: unknown) {
     const code = (error.body as { code?: string } | undefined)?.code;
     if (code && AUTH_ERRORS[code]) return AUTH_ERRORS[code];
   }
-  console.error(error);
+  // Erro de configuração cai aqui (ex.: BETTER_AUTH_SECRET faltando na Vercel): ver nos logs.
+  console.error("[auth] erro inesperado:", error);
   return "Não foi possível concluir. Tente de novo.";
 }
 
