@@ -45,8 +45,11 @@ Feito: `src/lib/comments.ts` (listar, `addComment` só insere se o debate estive
 - Comentar, listar e remover (autor ou admin); bloqueado em debate encerrado
 **Pronto quando:** o admin remove um comentário e ele some para todos.
 
-## [ ] Fase 6: E-mails (Brevo)
-- Chave em `.env.local`/Vercel; envio ao abrir debate e ao encerrar (incluindo prazo vencido, via cron da Vercel)
+## [x] Fase 6: E-mails (Brevo)
+Feito: `src/lib/email.ts` (POST na API do Brevo, um destinatário por versão, sem chave = pula) e `src/lib/notifications.ts`. Debate novo: avisa todos os aprovados menos o autor, via `after()` em `createDebate`. Encerramento (com resultado em totais): `notifyClosedDebates` reserva cada debate num único UPDATE (`debates.close_notified_at`), então nunca avisa duas vezes; libera de novo se o Brevo falhar; ignora encerramentos com mais de 3 dias. Roda ao encerrar, no cron diário (`/api/cron`, `vercel.json`, 8h de Brasília, exige `CRON_SECRET`) e ao abrir a lista/um debate (prazo vencido avisa na próxima visita). Regras testadas com `npm run db:test-emails` (sem enviar nada). Atenção: o plano grátis do Brevo manda 300 e-mails/dia; cada aviso gasta 1 por morador aprovado.
+- [x] Envio ao abrir debate e ao encerrar (incluindo prazo vencido, via cron da Vercel)
+- [ ] (você) Conta no Brevo: verificar o remetente e criar a chave de API; preencher `BREVO_API_KEY`, `EMAIL_FROM` (e `EMAIL_FROM_NAME`) no `.env.local` e na Vercel, mais `CRON_SECRET` na Vercel
+- [ ] (você) `npm run email:test -- seu@email` e depois `npm run email:test -- --aprovados`
 **Pronto quando:** e-mail de teste chega para os moradores aprovados.
 
 ## [ ] Fase 7: Revisão e lançamento

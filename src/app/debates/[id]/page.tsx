@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import { Suspense } from "react";
 import { ConfirmButton } from "@/components/form";
 import { DebateStatus } from "@/components/debate-status";
@@ -8,6 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 import { CHOICES, choiceLabel } from "@/lib/choices";
 import { listComments, type Comment } from "@/lib/comments";
 import { authorLabel, countUnits, formatDateTime, getDebate } from "@/lib/debates";
+import { notifyClosedDebates } from "@/lib/notifications";
 import { requireApproved, type CurrentUser } from "@/lib/session";
 import { getMyUnitVote, getResults, type Choice, type Results } from "@/lib/votes";
 import { closeDebate, deleteComment, deleteDebate, removeDeadline } from "../actions";
@@ -29,6 +31,8 @@ export default function DebatePage(props: PageProps<"/debates/[id]">) {
 
 async function DebateView({ params }: { params: PageProps<"/debates/[id]">["params"] }) {
   const user = await requireApproved();
+  // Prazo vencido entre uma execução do cron e outra: o aviso sai na próxima visita.
+  after(notifyClosedDebates);
   const { id } = await params;
   const debate = await getDebate(id);
   if (!debate) notFound();

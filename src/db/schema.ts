@@ -148,6 +148,8 @@ export const debates = pgTable("debates", {
   deadline: timestamp("deadline", { withTimezone: true }),
   // preenchido quando o admin encerra
   closedAt: timestamp("closed_at", { withTimezone: true }),
+  // quando o e-mail de encerramento foi enviado (null = ainda não)
+  closeNotifiedAt: timestamp("close_notified_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 

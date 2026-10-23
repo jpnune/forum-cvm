@@ -14,6 +14,8 @@
     "db:test-votes": "tsx --conditions=react-server --env-file=.env.local scripts/test-votes.mts",
     "db:test-comments": "tsx --conditions=react-server --env-file=.env.local scripts/test-comments.mts",
     "db:test-filters": "tsx --conditions=react-server --env-file=.env.local scripts/test-filters.mts",
+    "db:test-emails": "tsx --conditions=react-server --env-file=.env.local scripts/test-emails.mts",
+    "email:test": "tsx --conditions=react-server --env-file=.env.local scripts/send-test-email.mts",
     "db:make-admin": "tsx --conditions=react-server --env-file=.env.local scripts/make-admin.mts"
   },
   "dependencies": {

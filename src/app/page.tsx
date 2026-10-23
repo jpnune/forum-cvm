@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { after } from "next/server";
 import { Suspense } from "react";
 import { DebateStatus } from "@/components/debate-status";
 import { Loading } from "@/components/loading";
@@ -15,6 +16,7 @@ import {
   type Filter,
   type Sort,
 } from "@/lib/debates";
+import { notifyClosedDebates } from "@/lib/notifications";
 import { requireApproved } from "@/lib/session";
 import { markAllDebatesRead } from "./debates/actions";
 
@@ -28,6 +30,8 @@ export default function Home(props: PageProps<"/">) {
 
 async function Forum({ searchParams }: { searchParams: PageProps<"/">["searchParams"] }) {
   const user = await requireApproved();
+  // Prazo vencido entre uma execução do cron e outra: o aviso sai na próxima visita.
+  after(notifyClosedDebates);
   const params = await searchParams;
   const filter = parseFilter(params.ver);
   const sort = parseSort(params.ordem);

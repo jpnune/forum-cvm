@@ -1,0 +1,1 @@
+ALTER TABLE "debates" ADD COLUMN "close_notified_at" timestamp with time zone;

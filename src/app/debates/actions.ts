@@ -3,10 +3,12 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import type { FormState } from "@/app/auth-actions";
 import { addComment, COMMENT_MAX, removeComment } from "@/lib/comments";
 import { db } from "@/lib/db";
 import { markAllRead, markRead } from "@/lib/debates";
+import { notifyClosedDebates, notifyNewDebate } from "@/lib/notifications";
 import { requireAdmin, requireApproved } from "@/lib/session";
 import { castVote, type Choice } from "@/lib/votes";
 import { debates } from "@/db/schema";
@@ -36,6 +38,8 @@ export async function createDebate(_prev: FormState, formData: FormData): Promis
     .insert(debates)
     .values({ title, body, authorId: user.id })
     .returning({ id: debates.id });
+  // E-mail depois da resposta, para não atrasar quem criou.
+  after(() => notifyNewDebate(debate.id).catch((error) => console.error("[email] aviso de debate novo", error)));
   redirect(`/debates/${debate.id}`);
 }
 
@@ -79,6 +83,7 @@ export async function closeDebate(formData: FormData) {
     // Relógio do banco, o mesmo de created_at e da regra de debate aberto.
     .set({ closedAt: sql`now()` })
     .where(and(eq(debates.id, debateId(formData)), isNull(debates.closedAt)));
+  after(notifyClosedDebates);
   refresh();
 }
 
