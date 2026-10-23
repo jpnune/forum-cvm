@@ -14,7 +14,8 @@ Ao terminar: `npm run build` ok, marcar `[x]` aqui e fazer commit.
 - [ ] (você) Repositório no GitHub + projeto na Vercel com as 3 variáveis (BETTER_AUTH_URL = URL da Vercel)
 **Pronto quando:** a URL da Vercel abre a página inicial.
 
-## [ ] Fase 1: Banco e segurança
+## [x] Fase 1: Banco e segurança
+Feito: 9 tabelas no Neon, 256 apartamentos (blocos A e B, 16 andares × 8: 101–108 … 1601–1608) via `npm run db:seed`, regras de voto testadas com `npm run db:test-votes`. Para regenerar as tabelas do Better Auth, o CLI exige um config sem `server-only`.
 - `src/db/schema.ts`: tabelas do Better Auth (gerar com `npx @better-auth/cli generate`) + `units` (block, number), `profiles` (user_id, unit_id, name, role `resident|admin`, status `pending|approved|rejected|blocked`), `debates` (title, body, author_id, deadline nullable, closed_at), `votes` (debate_id, unit_id, user_id, choice `for|against|abstain`, updated_at; unique debate+unit), `comments`
 - `src/lib/auth.ts`: Better Auth com adapter Drizzle (só configuração, telas na Fase 2)
 - `src/lib/votes.ts`: único lugar que toca `votes`: `castVote` (upsert pelo apartamento, valida debate aberto), `getResults` (totais) e `getMyUnitVote`
