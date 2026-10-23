@@ -11,7 +11,7 @@ const userIds = [`test-${stamp}-1`, `test-${stamp}-2`];
 const [unit] = await db
   .select({ id: units.id })
   .from(units)
-  .where(and(eq(units.block, "A"), eq(units.number, 101)));
+  .where(and(eq(units.block, "A"), eq(units.number, 11)));
 if (!unit) throw new Error("Rode `npm run db:seed` antes.");
 
 let failed = false;
@@ -33,11 +33,11 @@ try {
     .returning({ id: debates.id });
 
   await castVote(userIds[0], debate.id, "for");
-  console.log("Morador 1 do A-101 votou: for", await getResults(debate.id));
+  console.log("Morador 1 do A-11 votou: for", await getResults(debate.id));
 
   await castVote(userIds[1], debate.id, "against");
   const results = await getResults(debate.id);
-  console.log("Morador 2 do A-101 votou: against", results);
+  console.log("Morador 2 do A-11 votou: against", results);
 
   check("apartamento tem 1 voto só", results.total === 1);
   check("vale o último voto (against)", results.against === 1 && results.for === 0);

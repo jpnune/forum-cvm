@@ -34,15 +34,15 @@ export function SignupForm() {
             ))}
           </div>
         </fieldset>
-        {/* Andar (1–16) + final 01–08: 101–108 … 1601–1608. `title` aparece no aviso do navegador. */}
+        {/* Andar (1–16) + apto (1–8): 11–18 … 161–168. `title` aparece no aviso do navegador. */}
         <Field
           label="Apartamento"
           name="number"
           inputMode="numeric"
-          pattern="([1-9]|1[0-6])0[1-8]"
-          title="Andar + final 01 a 08. Ex.: 101, 305, 1608"
-          placeholder="Ex.: 305"
-          hint="Andar + final 01 a 08 (101 a 1608)"
+          pattern="([1-9]|1[0-6])[1-8]"
+          title="Andar + apto (1 a 8). Ex.: 67 = 6º andar, apto 7; 161 = 16º andar, apto 1"
+          placeholder="Ex.: 67"
+          hint="Andar + apto. Ex.: 67 = 6º andar, apto 7"
           defaultValue={values.number}
           required
         />
