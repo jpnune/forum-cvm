@@ -9,20 +9,20 @@ Ao terminar: `npm run build` ok, marcar `[x]` aqui e fazer commit.
 | 1, 4, 7 | Opus | ligado | manual (revisar) |
 
 ## [x] Fase 0: Setup
-- [x] Next.js + TS + Tailwind, clientes Supabase, `.env.example`, docs, git
-- [ ] (você) Criar projeto no Supabase e preencher `.env.local`
-- [ ] (você) Repositório no GitHub + projeto na Vercel com as 2 variáveis
+- [x] Next.js + TS + Tailwind, Neon + Drizzle + Better Auth instalados, `.env.example`, docs, git
+- [ ] (você) Criar projeto grátis em neon.tech e preencher `.env.local` (DATABASE_URL + BETTER_AUTH_SECRET)
+- [ ] (você) Repositório no GitHub + projeto na Vercel com as 3 variáveis (BETTER_AUTH_URL = URL da Vercel)
 **Pronto quando:** a URL da Vercel abre a página inicial.
 
 ## [ ] Fase 1: Banco e segurança
-- Migration `0001_init.sql`: `units` (block, number), `profiles` (user_id, unit_id, name, role `resident|admin`, status `pending|approved|rejected|blocked`), `debates` (title, body, author_id, deadline nullable, closed_at), `votes` (debate_id, unit_id, choice `for|against|abstain`, updated_at; unique debate+unit), `comments`
-- RLS em todas as tabelas; `votes` sem SELECT para clientes
-- Funções: `cast_vote(debate_id, choice)` (upsert pelo apartamento do usuário, valida debate aberto) e `debate_results(debate_id)` (totais), mais uma forma de o morador ver o voto atual do seu apartamento
-- Seed dos 256 apartamentos (confirmar blocos/números com o usuário)
-**Pronto quando:** testes SQL mostram que um morador não lê votos alheios e o voto é sobrescrito.
+- `src/db/schema.ts`: tabelas do Better Auth (gerar com `npx @better-auth/cli generate`) + `units` (block, number), `profiles` (user_id, unit_id, name, role `resident|admin`, status `pending|approved|rejected|blocked`), `debates` (title, body, author_id, deadline nullable, closed_at), `votes` (debate_id, unit_id, user_id, choice `for|against|abstain`, updated_at; unique debate+unit), `comments`
+- `src/lib/auth.ts`: Better Auth com adapter Drizzle (só configuração, telas na Fase 2)
+- `src/lib/votes.ts`: único lugar que toca `votes`: `castVote` (upsert pelo apartamento, valida debate aberto), `getResults` (totais) e `getMyUnitVote`
+- `db:generate` + `db:migrate`; script de seed dos 256 apartamentos (confirmar blocos/números com o usuário)
+**Pronto quando:** as tabelas existem no Neon, o seed rodou e um script de teste mostra o voto sendo sobrescrito por apartamento.
 
 ## [ ] Fase 2: Cadastro, login e aprovação
-- Telas de cadastro (bloco/apto), login e logout; `proxy`/middleware renovando a sessão
+- Rota do Better Auth (`src/app/api/auth/[...all]/route.ts`), telas de cadastro (bloco/apto), login e logout; `proxy` protegendo as páginas
 - Tela "aguardando aprovação"; painel admin para aprovar/rejeitar/bloquear
 **Pronto quando:** um usuário novo só acessa o fórum depois de aprovado.
 
@@ -33,7 +33,7 @@ Ao terminar: `npm run build` ok, marcar `[x]` aqui e fazer commit.
 
 ## [ ] Fase 4: Votação
 - Botões A favor / Contra / Abstenção, voto atual do apartamento destacado, troca de voto
-- Resultado com barras, %, e "X de 256 apartamentos votaram"; atualização em tempo real (Supabase Realtime ou revalidação)
+- Resultado com barras, %, e "X de 256 apartamentos votaram"; atualização imediata após votar + refresh a cada ~10s na página do debate
 **Pronto quando:** dois moradores do mesmo apartamento votam e só o último conta.
 
 ## [ ] Fase 5: Comentários e moderação
@@ -41,10 +41,10 @@ Ao terminar: `npm run build` ok, marcar `[x]` aqui e fazer commit.
 **Pronto quando:** o admin remove um comentário e ele some para todos.
 
 ## [ ] Fase 6: E-mails (Brevo)
-- Chave em `.env.local`/Vercel; envio ao abrir debate e ao encerrar (incluindo prazo vencido, via cron da Vercel ou do Supabase)
+- Chave em `.env.local`/Vercel; envio ao abrir debate e ao encerrar (incluindo prazo vencido, via cron da Vercel)
 **Pronto quando:** e-mail de teste chega para os moradores aprovados.
 
 ## [ ] Fase 7: Revisão e lançamento
-- Revisão de segurança (RLS), teste no celular, textos, página 404, favicon
+- Revisão de segurança (nenhuma rota expõe votos individuais; toda action checa sessão/aprovação), teste no celular, textos, página 404, favicon
 - Criar a conta admin do síndico; divulgar o link
 **Pronto quando:** o síndico usa em produção.
